@@ -26,12 +26,16 @@ jobs:
       - name: Show Chrome version
         run: chrome --version
 
-      - name: Set up ChromeDriver
-        uses: nanasess/setup-chromedriver@v2
+      - name: Get Chrome version
+        id: get-chrome-version
         run: |
           CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+' || true)
-          echo "CHROME_VERSION=$CHROME_VERSION" >> $GITHUB_ENV
-          echo "::set-output name=version::$CHROME_VERSION"
+          echo "version=$CHROME_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Set up ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
+        with:
+          chromedriver-version: ${{ steps.get-chrome-version.outputs.version }}
 
       - name: Set up ChromeDriver
         uses: nanasess/setup-chromedriver@v2
