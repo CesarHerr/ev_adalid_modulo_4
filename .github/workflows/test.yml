@@ -42,9 +42,6 @@ jobs:
         with:
           chromedriver-version: ${{ steps.get-chrome-version.outputs.version }}
 
-      - name: Grant execute permission to Maven Wrapper
-        run: chmod +x mvnw
-
       - name: Build and run unit tests
         run: mvn clean test
 
