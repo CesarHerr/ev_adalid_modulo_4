@@ -28,8 +28,15 @@ jobs:
 
       - name: Set up ChromeDriver
         uses: nanasess/setup-chromedriver@v2
+        run: |
+          CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+' || true)
+          echo "CHROME_VERSION=$CHROME_VERSION" >> $GITHUB_ENV
+          echo "::set-output name=version::$CHROME_VERSION"
+
+      - name: Set up ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
         with:
-          chromedriver-version: 'latest'
+          chromedriver-version: ${{ steps.get-chrome-version.outputs.version }}
 
       - name: Grant execute permission to Maven Wrapper
         run: chmod +x mvnw
