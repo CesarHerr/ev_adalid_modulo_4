@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Peso Usuario</title></head>
+<body>
+  <h2>Actualización de peso</h2>
+  <label>Nombre: <input type="text" id="nombre" value="César" /></label><br/>
+  <label>Peso: <input type="number" id="peso" /></label><br/>
+  <button id="btn-actualizar" onclick="actualizar()">Actualizar</button>
+  <p id="peso-actual"></p>
+
+  <script>
+    function actualizar() {
+      let peso = parseFloat(document.getElementById("peso").value);
+      let pesoFinal = peso;
+      document.getElementById("peso-actual").innerText = pesoFinal.toFixed(1);
+    }
+  </script>
+</body>
+</html>
