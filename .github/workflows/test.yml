@@ -53,13 +53,10 @@ jobs:
         with:
           chromedriver-version: ${{ steps.get-chrome-version.outputs.version }}
 
-      - name: Build and run unit tests
-        run: mvn clean test
+      - name: Build, Test and SonarCloud Analyze
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: mvn clean verify sonar:sonar
 
       - name: Run Selenium tests
         run: mvn test -Pselenium
-
-      - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@v1.9
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_2 }}
