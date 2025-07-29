@@ -56,10 +56,11 @@ jobs:
       - name: Build, Test and SonarCloud Analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn clean verify sonar:sonar \
-          -Dsonar.projectKey=CesarHerr_Ev_devOps_Adalid \
-          -Dsonar.organization=cesarherr \
-          -Dsonar.host.url=https://sonarcloud.io
+        run: |
+          mvn clean verify sonar:sonar \
+            -Dsonar.projectKey=CesarHerr_Ev_devOps_Adalid \
+            -Dsonar.organization=cesarherr \
+            -Dsonar.host.url=https://sonarcloud.io
 
       - name: Run Selenium tests
         run: mvn test -Pselenium
