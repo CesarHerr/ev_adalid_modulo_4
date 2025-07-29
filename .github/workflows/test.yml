@@ -1,74 +1,90 @@
+# Nombre del flujo de trabajo
 name: Run Tests and Analyze Code
 
+# Cuándo se ejecuta este flujo de trabajo:
 on:
+  # Cuando hay un push (subida de código) a la rama main
   push:
     branches: [ main ]
+  # Cuando se crea un pull request hacia la rama main
   pull_request:
     branches: [ main ]
 
 jobs:
+  # Definición del trabajo que ejecutará este flujo
   build-test-analyze:
+    # Define el sistema operativo del runner
     runs-on: ubuntu-latest
 
     steps:
+      # Paso 1: Clonar el repositorio en el runner
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Paso 2: Configurar Python en el runner
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: '3.x'  
 
+      # Paso 3: Levantar un servidor HTTP para servir archivos estáticos (carpeta "resources")
       - name: Levantar servidor HTTP estático
         run: |
-          cd resources
-          python3 -m http.server 8080 &
-          sleep 5
+          cd resources               
+          python3 -m http.server 8080 &  
+          sleep 5                    
 
+      # Paso 4: Configurar Java (versión 17)
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
+      # Paso 5: Cachear archivos de SonarQube (para acelerar análisis)
       - name: Cache SonarQube packages
         uses: actions/cache@v4
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
+
+      # Paso 6: Cachear dependencias de Maven
       - name: Cache Maven packages
         uses: actions/cache@v4
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+
+      # Paso 7: Compilar y analizar
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=CesarHerr_Ev_devOps_Adalid
 
+      # Paso 8: Instalar Chrome (requerido para Selenium)
       - name: Set up Chrome
         uses: browser-actions/setup-chrome@v1
 
+      # Paso 9: Mostrar versión de Chrome instalada
       - name: Show Chrome version
         run: chrome --version
 
+      # Paso 10: Obtener la versión de Chrome instalada (para usarla en el siguiente paso)
       - name: Get Chrome version
         id: get-chrome-version
         run: |
           CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+' || true)
           echo "version=$CHROME_VERSION" >> $GITHUB_OUTPUT
 
+      # Paso 11: Instalar ChromeDriver (versión debe coincidir con Chrome)
       - name: Set up ChromeDriver
         uses: nanasess/setup-chromedriver@v2
         with:
           chromedriver-version: ${{ steps.get-chrome-version.outputs.version }}
 
-      - name: Set up ChromeDriver
-        uses: nanasess/setup-chromedriver@v2
-        with:
-          chromedriver-version: ${{ steps.get-chrome-version.outputs.version }}
-
+      # Paso 13: Ejecutar pruebas Selenium
       - name: Run Selenium tests
         run: mvn test -Pselenium
+
